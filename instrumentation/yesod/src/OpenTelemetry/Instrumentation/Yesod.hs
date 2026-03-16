@@ -82,7 +82,7 @@ mkRouteToRenderer appName ress = do
 goTree :: (Pat -> Pat) -> [String] -> ResourceTree a -> Q [Clause]
 goTree front names (ResourceLeaf res) = pure <$> goRes front names res
 #if MIN_VERSION_template_haskell(2, 18, 0)
-goTree front names (ResourceParent name _check pieces trees) =
+goTree front names (ResourceParent name _check _attrs pieces trees) =
   concat <$> mapM (goTree front' newNames) trees
   where
     ignored = (replicate toIgnore WildP ++) . pure
@@ -132,12 +132,12 @@ mkRouteToPattern appName ress = do
     toText s = VarE 'T.pack `AppE` LitE (StringL s)
     isDynamic Dynamic {} = True
     isDynamic Static {} = False
-    parentPieceWrapper (parentName, pieces) nestedPat = ConP (mkName parentName) [] $ mconcat
-      [ replicate (length $ filter isDynamic pieces) WildP
+    parentDetailsWrapper ParentDetails {..} nestedPat = ConP (mkName pdName) [] $ mconcat
+      [ replicate (length $ filter isDynamic pdPieces) WildP
       , [nestedPat]
       ]
     mkClause fr@FlatResource{..} = do
-      let clausePattern = foldr parentPieceWrapper (RecP (mkName frName) []) frParentPieces
+      let clausePattern = foldr parentDetailsWrapper (RecP (mkName frName) []) frParentDetails
       pure $ Clause
         [clausePattern]
         (NormalB $ toText $ renderPattern fr)
@@ -193,8 +193,8 @@ renderPattern FlatResource {..} =
 
     formattedParentPieces :: [String]
     formattedParentPieces = do
-      (_parentName, pieces) <- frParentPieces
-      piece <- pieces
+      ParentDetails {..} <- frParentDetails
+      piece <- pdPieces
       routePortionSection piece
 
 

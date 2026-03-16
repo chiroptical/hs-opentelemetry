@@ -104,9 +104,19 @@ in rec {
     lib.filterAttrs (k: _: !builtins.hasAttr k (pluckLocalPackages hsPackageSet))
     (localDevPackageDeps hsPackageSet);
 
-  nixpkgsHaskellTweaks = _final: prev: {
+  nixpkgsHaskellTweaks = final: prev: {
     # nixpkgs has 0.7.1.5, 0.7.1.6 relaxes bounds for 9.10, but we can also just
     # relax the bounds of 0.7.1.5 ourselves
     proto-lens = pkgs.haskell.lib.compose.doJailbreak prev.proto-lens;
+
+    yesod-core = final.callCabal2nix "yesod-core" (
+      pkgs.fetchFromGitHub {
+        owner = "yesodweb";
+        repo = "yesod";
+        rev = "0859c1fb90a17b02f369a6141a8d0a0849f09ad1";
+        hash = "sha256-+X3GvB2gpI62JCNeDkCCOunRjyuVQFvwkYrBSxXNqls=";
+      }
+      + /yesod-core
+    ) {};
   };
 }
