@@ -113,8 +113,8 @@ in rec {
       pkgs.fetchFromGitHub {
         owner = "yesodweb";
         repo = "yesod";
-        rev = "0859c1fb90a17b02f369a6141a8d0a0849f09ad1";
-        hash = "sha256-+X3GvB2gpI62JCNeDkCCOunRjyuVQFvwkYrBSxXNqls=";
+        rev = "2c8149f3dc358b5e24309d3c82df0ed837b1bd9d";
+        hash = "sha256-vJDPJ3b09nehXlfIHnFypykxKUVyZFsvdiwxPoK4jwM=";
       }
       + /yesod-core
     ) {};
